@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Members: 3-Minute Vocabulary Blitz</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            500: '#0284c7',
+                            600: '#0369a1',
+                            700: '#075985',
+                        },
+                        amberGlow: '#f59e0b',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        bubble: ['Fredoka', 'system-ui', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Canvas Confetti CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- QRCode.js CDN for sharing with students -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+        .font-bubble {
+            font-family: 'Fredoka', cursive, sans-serif;
+        }
+        .pulse-timer {
+            animation: pulse-ring 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.85; }
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col bg-slate-50 selection:bg-sky-100 selection:text-sky-800">
+
+    <!-- Top Navigation Bar & Mode Switcher -->
+    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm transition-all">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
+            <div class="flex items-center space-x-3">
+                <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
+                    👨‍👩‍👧‍👦
+                </span>
+                <div>
+                    <h1 class="text-lg font-bold font-bubble text-slate-800 leading-tight">Family Vocabulary Blitz</h1>
+                    <p class="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
+                        <span id="connectionDot" class="w-2 h-2 rounded-full bg-emerald-500 inline-block animate-pulse"></span>
+                        <span id="connectionText">Real-Time Sync Ready</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Role View Switcher & Action Tools -->
+            <div class="flex items-center gap-2">
+                <button id="sharePromptBtn" class="px-3.5 py-2 text-xs sm:text-sm font-bold rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 shadow-sm transition flex items-center gap-2">
+                    <i class="fa-solid fa-qrcode text-amber-600"></i>
+                    <span class="hidden sm:inline">Invite Students</span>
+                </button>
+
+                <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button id="navStudentBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-sky-600 shadow-sm">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Student View</span>
+                    </button>
+                    <button id="navTeacherBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                        <span class="hidden md:inline">Teacher Board</span>
+                        <span class="md:hidden">Teacher</span>
+                        <span id="liveBadgeCount" class="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-indigo-100 text-indigo-700 rounded-full">0</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-start">
+
+        <!-- ======================= SECTION 1: STUDENT VIEW ======================= -->
+        <section id="studentView" class="w-full max-w-3xl mx-auto space-y-6">
+            
+            <!-- Step 1: Join / Enter Name Screen -->
+            <div id="studentJoinCard" class="bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-100 text-center transition-all duration-300">
+                <div class="w-20 h-20 bg-sky-50 text-sky-500 rounded-3xl mx-auto flex items-center justify-center text-4xl mb-6 shadow-inner">
+                    👋
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-800 font-bubble mb-2">Welcome to the Vocabulary Blitz!</h2>
+                <p class="text-slate-600 max-w-md mx-auto text-sm sm:text-base mb-6">
+                    How many English <strong class="text-sky-600 font-bold">Family & Relative</strong> words can you remember in <strong class="text-sky-600 font-bold">3 minutes</strong>?
+                </p>
+
+                <form id="joinForm" class="max-w-md mx-auto space-y-4">
+                    <div class="text-left">
+                        <label for="studentNameInput" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Your Full Name or Nickname:</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                                <i class="fa-solid fa-user"></i>
+                            </span>
+                            <input type="text" id="studentNameInput" required placeholder="e.g. Daisy, Liam or Alex" 
+                                class="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 font-semibold text-slate-800 transition text-base">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 px-6 bg-gradient-to-r from-sky-500 to-indigo-600 hover:from-sky-600 hover:to-indigo-700 text-white font-bold rounded-2xl shadow-lg shadow-sky-500/25 active:scale-[0.98] transition-all flex items-center justify-center gap-2 text-lg">
+                        <i class="fa-solid fa-play"></i> Start 3-Minute Sprint
+                    </button>
+                </form>
+
+                <div class="mt-8 pt-6 border-t border-slate-100 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500 font-medium">
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-stopwatch text-amber-500"></i> 180s Countdown</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-spell-check text-emerald-500"></i> Case-insensitive</span>
+                    <span>•</span>
+                    <span class="flex items-center gap-1.5"><i class="fa-solid fa-bolt text-indigo-500"></i> Instant Live Sync</span>
+                </div>
+            </div>
+
+            <!-- Step 2: Active Challenge Screen -->
+            <div id="studentQuizCard" class="hidden space-y-5">
+                <!-- Top Status Card -->
+                <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <div class="flex items-center gap-3 w-full sm:w-auto">
+                        <div class="w-12 h-12 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xl">
+                            <i class="fa-solid fa-user-graduate"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Candidate</span>
+                            <h3 id="displayStudentName" class="text-lg font-bold text-slate-800 truncate max-w-[200px]">Student Name</h3>
+                        </div>
+                    </div>
+
+                    <!-- Countdown Timer & Counter -->
+                    <div class="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-end">
+                        <div class="px-4 py-2 bg-slate-50 border border-slate-200 rounded-2xl flex items-center gap-3 flex-1 sm:flex-initial">
+                            <i class="fa-solid fa-clock text-xl text-sky-500" id="timerIcon"></i>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block tracking-wider">Time Left</span>
+                                <span id="countdownTimer" class="text-2xl font-black font-mono text-slate-800 tracking-wider">03:00</span>
+                            </div>
+                        </div>
+
+                        <!-- Word Counter -->
+                        <div class="px-4 py-2 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3 flex-1 sm:flex-initial">
+                            <i class="fa-solid fa-check-double text-xl text-emerald-500"></i>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-emerald-600 block tracking-wider">Words Added</span>
+                                <span id="wordCountLabel" class="text-2xl font-black text-emerald-700">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input & Tags Container -->
+                <div class="bg-white rounded-3xl p-6 sm:p-8 shadow-xl border border-slate-100 space-y-6">
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label for="wordInput" class="block text-sm font-bold text-slate-700">
+                                Enter a family member and press <kbd class="px-2 py-0.5 text-xs bg-slate-100 text-slate-600 rounded border border-slate-300 font-mono font-bold">Enter</kbd>:
+                            </label>
+                            <span class="text-xs text-slate-400 italic hidden sm:inline">e.g. father, aunt, twin, nephew</span>
+                        </div>
+                        <form id="wordAddForm" class="flex gap-2">
+                            <div class="relative flex-1">
+                                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+                                    <i class="fa-solid fa-heart"></i>
+                                </span>
+                                <input type="text" id="wordInput" autocomplete="off" placeholder="e.g. grandmother, cousin, brother-in-law..." 
+                                    class="w-full pl-11 pr-4 py-3.5 rounded-2xl border-2 border-slate-200 focus:border-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-100 font-semibold text-slate-800 text-base transition">
+                            </div>
+                            <button type="submit" id="addWordBtn" class="px-6 py-3.5 bg-sky-500 hover:bg-sky-600 active:scale-95 text-white font-bold rounded-2xl shadow-md transition flex items-center gap-2">
+                                <i class="fa-solid fa-plus"></i>
+                                <span>Add</span>
+                            </button>
+                        </form>
+                        <p id="inputFeedback" class="text-xs text-rose-500 font-medium mt-1.5 hidden"></p>
+                    </div>
+
+                    <!-- Tags list of entered words -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Your Word List:</span>
+                            <span class="text-xs text-slate-400">Click <i class="fa-solid fa-xmark text-rose-400"></i> on any word to delete</span>
+                        </div>
+                        <div id="tagsContainer" class="min-h-[140px] max-h-[260px] overflow-y-auto custom-scrollbar p-4 bg-slate-50 rounded-2xl border-2 border-dashed border-slate-200 flex flex-wrap content-start gap-2">
+                            <p id="emptyTagsNote" class="text-slate-400 text-sm italic m-auto py-8">No words entered yet. Type your first word above!</p>
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <button type="button" id="manualSubmitBtn" class="w-full sm:w-auto px-8 py-3.5 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/25 active:scale-95 transition flex items-center justify-center gap-2 text-base">
+                            <i class="fa-solid fa-paper-plane"></i> Submit Final Answers
+                        </button>
+                        <p class="text-xs text-slate-400 text-center sm:text-right">
+                            The system will <strong>automatically submit</strong> when 3 minutes end.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Finished / Submitted Screen -->
+            <div id="studentSubmittedCard" class="hidden bg-white rounded-3xl p-8 sm:p-12 shadow-xl border border-slate-100 text-center space-y-6">
+                <div class="w-20 h-20 bg-emerald-50 text-emerald-500 rounded-3xl mx-auto flex items-center justify-center text-4xl shadow-inner animate-bounce">
+                    🎉
+                </div>
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-800 font-bubble">Awesome Job!</h2>
+                    <p class="text-slate-600 text-sm mt-1">Your family vocabulary has been beamed straight to the Teacher Live Board!</p>
+                </div>
+
+                <div class="max-w-md mx-auto bg-slate-50 rounded-2xl p-6 border border-slate-200">
+                    <span class="text-xs uppercase font-bold text-slate-400">Your Score</span>
+                    <div class="text-5xl font-black text-emerald-600 my-2" id="finalWordCount">0</div>
+                    <div class="text-sm font-semibold text-slate-600 mb-4">valid family words remembered</div>
+                    
+                    <div id="submittedWordsSummary" class="flex flex-wrap gap-1.5 justify-center max-h-48 overflow-y-auto custom-scrollbar p-2">
+                        <!-- tags preview -->
+                    </div>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button type="button" id="studentRetryBtn" class="px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-rotate-left"></i> Play Again
+                    </button>
+                    <button type="button" id="studentGoToDashboardBtn" class="px-6 py-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold transition flex items-center gap-2 text-sm">
+                        <i class="fa-solid fa-chalkboard-user"></i> View Class Projector Board
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ======================= SECTION 2: TEACHER / PROJECTOR VIEW ======================= -->
+        <section id="teacherView" class="hidden space-y-6 w-full">
+            
+            <!-- Dashboard Controls Bar -->
+            <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-600 text-white flex items-center justify-center text-xl shadow-md shadow-indigo-500/20">
+                        <i class="fa-solid fa-chalkboard"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold font-bubble text-slate-800">Teacher Live Dashboard</h2>
+                        <p class="text-xs text-slate-500">Topic: <span class="font-bold text-sky-600">Family Members</span> • Real-time Class Sync</p>
+                    </div>
+                </div>
+
+                <!-- Stats summary chips -->
+                <div class="flex flex-wrap items-center gap-3">
+                    <div class="px-4 py-2 bg-sky-50 text-sky-700 rounded-2xl border border-sky-100 flex items-center gap-2.5">
+                        <i class="fa-solid fa-users text-sky-500"></i>
+                        <div>
+                            <span class="text-[10px] block font-bold uppercase text-sky-500">Students Joined</span>
+                            <span id="teacherTotalStudents" class="text-lg font-black leading-none">0</span>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-2 bg-emerald-50 text-emerald-700 rounded-2xl border border-emerald-100 flex items-center gap-2.5">
+                        <i class="fa-solid fa-tags text-emerald-500"></i>
+                        <div>
+                            <span class="text-[10px] block font-bold uppercase text-emerald-500">Total Words</span>
+                            <span id="teacherTotalWords" class="text-lg font-black leading-none">0</span>
+                        </div>
+                    </div>
+
+                    <div class="px-4 py-2 bg-purple-50 text-purple-700 rounded-2xl border border-purple-100 flex items-center gap-2.5">
+                        <i class="fa-solid fa-layer-group text-purple-500"></i>
+                        <div>
+                            <span class="text-[10px] block font-bold uppercase text-purple-500">Unique Vocabulary</span>
+                            <span id="teacherUniqueWordsCount" class="text-lg font-black leading-none">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Buttons -->
+                <div class="flex items-center gap-2">
+                    <button id="exportCsvBtn" title="Download Excel/CSV summary" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-file-csv"></i>
+                        <span class="hidden md:inline">Export CSV</span>
+                    </button>
+                    <button id="toggleFullscreenBtn" title="Projector Fullscreen" class="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-expand"></i>
+                        <span class="hidden md:inline">Fullscreen</span>
+                    </button>
+                    <button id="resetSessionBtn" title="Reset for next round" class="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold text-sm transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate"></i>
+                        <span class="hidden md:inline">New Round</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aggregated Class Word Bank / Word Cloud -->
+            <div class="bg-gradient-to-br from-indigo-900 via-slate-900 to-sky-950 rounded-3xl p-6 sm:p-8 text-white shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/10 pb-4">
+                    <div>
+                        <h3 class="text-xl font-bold font-bubble flex items-center gap-2">
+                            <span>☁️ Whole-Class Word Cloud Bank</span>
+                            <span class="text-xs px-2.5 py-0.5 rounded-full bg-indigo-500/30 text-indigo-200 border border-indigo-400/30">Live Aggregate</span>
+                        </h3>
+                        <p class="text-xs text-slate-300 mt-0.5">Words recalled by multiple students grow larger with distinctive warm colors!</p>
+                    </div>
+
+                    <!-- Search filter -->
+                    <div class="relative w-full sm:w-64">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400 text-xs">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="teacherWordSearch" placeholder="Filter vocabulary..." 
+                            class="w-full pl-9 pr-3 py-2 rounded-xl bg-white/10 border border-white/20 text-white placeholder-slate-400 text-sm focus:outline-none focus:ring-2 focus:ring-sky-400">
+                    </div>
+                </div>
+
+                <div id="wordCloudContainer" class="min-h-[140px] max-h-[300px] overflow-y-auto custom-scrollbar flex flex-wrap items-center justify-center gap-3 p-4">
+                    <p class="text-slate-400 italic text-sm text-center py-6">No words submitted yet. Invite students using the QR Code!</p>
+                </div>
+            </div>
+
+            <!-- Students Submission Cards Grid -->
+            <div class="space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">
+                        <i class="fa-solid fa-trophy text-amber-500"></i>
+                        <span>Student Leaderboard & Submissions</span>
+                    </h3>
+                    <div class="text-xs text-slate-500 font-medium">
+                        Order: <span class="font-bold text-slate-700">Highest Score First</span>
+                    </div>
+                </div>
+
+                <!-- Cards grid -->
+                <div id="studentsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                    <!-- Populated dynamically via JS -->
+                </div>
+
+                <!-- Empty state -->
+                <div id="emptySubmissionsState" class="bg-white rounded-3xl p-12 text-center border-2 border-dashed border-slate-200">
+                    <div class="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-3">
+                        <i class="fa-solid fa-inbox"></i>
+                    </div>
+                    <h4 class="text-base font-bold text-slate-700">Waiting for Students to Submit</h4>
+                    <p class="text-xs text-slate-500 max-w-sm mx-auto mt-1">Once students finish their 3-minute blitz or submit manually, their full vocabulary lists will appear here automatically.</p>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Modal: Share with Students (Link & QR Code) -->
+    <div id="shareModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center space-y-5">
+            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 mx-auto flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-qrcode"></i>
+            </div>
+            <div>
+                <h4 class="text-2xl font-bold font-bubble text-slate-800">Invite Students to Play</h4>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Ask students to scan the QR code below on their phones or tablets to start typing immediately!</p>
+            </div>
+
+            <!-- QR Container -->
+            <div class="p-4 bg-white rounded-2xl border-2 border-slate-100 inline-block shadow-inner mx-auto">
+                <div id="qrcode" class="flex justify-center items-center"></div>
+            </div>
+
+            <!-- Direct Link Copy Field -->
+            <div class="space-y-2 text-left">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Direct Student Link:</label>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="shareUrlInput" readonly class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-mono text-slate-600 select-all outline-none">
+                    <button type="button" id="copyShareUrlBtn" class="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 whitespace-nowrap">
+                        <i class="fa-regular fa-copy"></i>
+                        <span>Copy</span>
+                    </button>
+                </div>
+                <p id="copySuccessMsg" class="text-xs text-emerald-600 font-semibold hidden text-center">Copied to clipboard!</p>
+            </div>
+
+            <div class="pt-2">
+                <button type="button" id="closeShareModalBtn" class="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- General Alert / Confirmation Modal -->
+    <div id="appModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[100] hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-sm w-full shadow-2xl border border-slate-100 text-center space-y-4">
+            <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-sky-50 text-sky-500 mx-auto flex items-center justify-center text-2xl">
+                <i class="fa-solid fa-circle-info"></i>
+            </div>
+            <h4 id="modalTitle" class="text-xl font-bold font-bubble text-slate-800">Notification</h4>
+            <p id="modalMessage" class="text-sm text-slate-600">Notification message goes here.</p>
+            <div id="modalActions" class="flex items-center justify-center gap-3 pt-2">
+                <button type="button" id="modalCancelBtn" class="w-1/2 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-sm transition hidden">
+                    Cancel
+                </button>
+                <button type="button" id="modalConfirmBtn" class="w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition">
+                    OK
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, deleteDoc, onSnapshot, collection } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global Variables & Configuration
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-vocab-blitz';
+        
+        let firebaseConfig = {
+            apiKey: "dummy-key",
+            authDomain: "dummy.firebaseapp.com",
+            projectId: "dummy-project"
+        };
+        if (typeof __firebase_config !== 'undefined') {
+            try {
+                firebaseConfig = JSON.parse(__firebase_config);
+            } catch (e) {
+                console.warn("Could not parse __firebase_config", e);
+            }
+        }
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // State
+        let currentUser = null;
+        let isConnectedToCloud = false;
+        let localStudentWords = [];
+        let studentName = "";
+        let timerInterval = null;
+        let secondsRemaining = 180; // 3 minutes = 180 seconds
+        let allSubmissions = []; // submissions gathered from Cloud / Broadcast
+
+        // Cross-tab real-time sync backup (BroadcastChannel)
+        const broadcast = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('vocab_blitz_channel') : null;
+        if (broadcast) {
+            broadcast.onmessage = (event) => {
+                if (event.data?.type === 'NEW_SUBMISSION') {
+                    handleIncomingSubmission(event.data.payload);
+                } else if (event.data?.type === 'RESET_ALL') {
+                    allSubmissions = [];
+                    renderTeacherDashboard();
+                }
+            };
+        }
+
+        // Web Audio Synthesizer (No external sound files)
+        const AudioFX = {
+            ctx: null,
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    if (AudioContext) this.ctx = new AudioContext();
+                }
+            },
+            playBeep(freq = 600, duration = 0.15, type = 'sine') {
+                try {
+                    this.init();
+                    if (!this.ctx) return;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = type;
+                    osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start();
+                    osc.stop(this.ctx.currentTime + duration);
+                } catch(e) {}
+            },
+            playTimerFinish() {
+                this.playBeep(440, 0.2);
+                setTimeout(() => this.playBeep(587.33, 0.2), 200);
+                setTimeout(() => this.playBeep(880, 0.4, 'triangle'), 400);
+            },
+            playWordAdded() {
+                this.playBeep(750, 0.08, 'sine');
+            }
+        };
+
+        // DOM Elements
+        const navStudentBtn = document.getElementById('navStudentBtn');
+        const navTeacherBtn = document.getElementById('navTeacherBtn');
+        const studentView = document.getElementById('studentView');
+        const teacherView = document.getElementById('teacherView');
+        const connectionDot = document.getElementById('connectionDot');
+        const connectionText = document.getElementById('connectionText');
+
+        // Student Elements
+        const studentJoinCard = document.getElementById('studentJoinCard');
+        const studentQuizCard = document.getElementById('studentQuizCard');
+        const studentSubmittedCard = document.getElementById('studentSubmittedCard');
+        const joinForm = document.getElementById('joinForm');
+        const studentNameInput = document.getElementById('studentNameInput');
+        const displayStudentName = document.getElementById('displayStudentName');
+        const countdownTimer = document.getElementById('countdownTimer');
+        const timerIcon = document.getElementById('timerIcon');
+        const wordCountLabel = document.getElementById('wordCountLabel');
+        const wordAddForm = document.getElementById('wordAddForm');
+        const wordInput = document.getElementById('wordInput');
+        const inputFeedback = document.getElementById('inputFeedback');
+        const tagsContainer = document.getElementById('tagsContainer');
+        const manualSubmitBtn = document.getElementById('manualSubmitBtn');
+        const finalWordCount = document.getElementById('finalWordCount');
+        const submittedWordsSummary = document.getElementById('submittedWordsSummary');
+        const studentRetryBtn = document.getElementById('studentRetryBtn');
+        const studentGoToDashboardBtn = document.getElementById('studentGoToDashboardBtn');
+
+        // Teacher Elements
+        const teacherTotalStudents = document.getElementById('teacherTotalStudents');
+        const teacherTotalWords = document.getElementById('teacherTotalWords');
+        const teacherUniqueWordsCount = document.getElementById('teacherUniqueWordsCount');
+        const liveBadgeCount = document.getElementById('liveBadgeCount');
+        const wordCloudContainer = document.getElementById('wordCloudContainer');
+        const teacherWordSearch = document.getElementById('teacherWordSearch');
+        const studentsGrid = document.getElementById('studentsGrid');
+        const emptySubmissionsState = document.getElementById('emptySubmissionsState');
+        const resetSessionBtn = document.getElementById('resetSessionBtn');
+        const toggleFullscreenBtn = document.getElementById('toggleFullscreenBtn');
+        const exportCsvBtn = document.getElementById('exportCsvBtn');
+
+        // Share Modal Elements
+        const sharePromptBtn = document.getElementById('sharePromptBtn');
+        const shareModal = document.getElementById('shareModal');
+        const closeShareModalBtn = document.getElementById('closeShareModalBtn');
+        const shareUrlInput = document.getElementById('shareUrlInput');
+        const copyShareUrlBtn = document.getElementById('copyShareUrlBtn');
+        const copySuccessMsg = document.getElementById('copySuccessMsg');
+        const qrcodeContainer = document.getElementById('qrcode');
+
+        // General Alert Modal Elements
+        const appModal = document.getElementById('appModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+
+        function showAppModal(title, msg, onConfirm = null, showCancel = false) {
+            modalTitle.innerText = title;
+            modalMessage.innerText = msg;
+            if (showCancel) {
+                modalCancelBtn.classList.remove('hidden');
+                modalConfirmBtn.className = "w-1/2 py-3 bg-rose-500 hover:bg-rose-600 text-white font-bold rounded-xl text-sm transition";
+            } else {
+                modalCancelBtn.classList.add('hidden');
+                modalConfirmBtn.className = "w-full py-3 bg-sky-500 hover:bg-sky-600 text-white font-bold rounded-xl text-sm transition";
+            }
+            appModal.classList.remove('hidden');
+
+            modalCancelBtn.onclick = () => appModal.classList.add('hidden');
+            modalConfirmBtn.onclick = () => {
+                appModal.classList.add('hidden');
+                if (onConfirm) onConfirm();
+            };
+        }
+
+        // --- Authentication & Real-Time Sync Setup ---
+        async function authenticateAndSubscribe() {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+                currentUser = auth.currentUser;
+                isConnectedToCloud = true;
+                connectionDot.classList.replace('bg-amber-400', 'bg-emerald-500');
+                connectionText.textContent = "Live Cloud Sync Active";
+
+                listenToSubmissions();
+            } catch (err) {
+                console.warn("Using offline / local broadcast channel bridge:", err);
+                connectionDot.classList.replace('bg-amber-400', 'bg-sky-400');
+                connectionText.textContent = "Local Network Mode";
+            }
+        }
+
+        function listenToSubmissions() {
+            if (!currentUser) return;
+            const submissionsRef = collection(db, 'artifacts', appId, 'public', 'data', 'submissions');
+            
+            onSnapshot(submissionsRef, (snapshot) => {
+                const list = [];
+                snapshot.forEach(docSnap => {
+                    list.push({ id: docSnap.id, ...docSnap.data() });
+                });
+                allSubmissions = list;
+                renderTeacherDashboard();
+            }, (error) => {
+                console.warn("Firestore live snapshot note:", error);
+            });
+        }
+
+        function handleIncomingSubmission(sub) {
+            const exists = allSubmissions.some(s => s.id === sub.id);
+            if (!exists) {
+                allSubmissions.push(sub);
+                renderTeacherDashboard();
+            }
+        }
+
+        // --- Navigation Switcher ---
+        function setView(view) {
+            if (view === 'student') {
+                studentView.classList.remove('hidden');
+                teacherView.classList.add('hidden');
+                navStudentBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-sky-600 shadow-sm";
+                navTeacherBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+            } else {
+                teacherView.classList.remove('hidden');
+                studentView.classList.add('hidden');
+                navTeacherBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
+                navStudentBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
+                renderTeacherDashboard();
+            }
+        }
+
+        navStudentBtn.addEventListener('click', () => setView('student'));
+        navTeacherBtn.addEventListener('click', () => setView('teacher'));
+        studentGoToDashboardBtn.addEventListener('click', () => setView('teacher'));
+
+        // --- Student Flow Logic ---
+        joinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = studentNameInput.value.trim();
+            if (!name) return;
+            studentName = name;
+            displayStudentName.textContent = studentName;
+
+            studentJoinCard.classList.add('hidden');
+            studentQuizCard.classList.remove('hidden');
+            studentSubmittedCard.classList.add('hidden');
+
+            localStudentWords = [];
+            renderStudentTags();
+            startCountdown();
+            wordInput.focus();
+        });
+
+        function formatTime(totalSeconds) {
+            const mins = Math.floor(totalSeconds / 60);
+            const secs = totalSeconds % 60;
+            return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+        }
+
+        function startCountdown() {
+            clearInterval(timerInterval);
+            secondsRemaining = 180; // 3 minutes
+            countdownTimer.textContent = formatTime(secondsRemaining);
+            countdownTimer.classList.remove('text-rose-600', 'pulse-timer');
+            countdownTimer.classList.add('text-slate-800');
+            timerIcon.classList.remove('text-rose-500', 'animate-spin');
+
+            timerInterval = setInterval(() => {
+                secondsRemaining--;
+                countdownTimer.textContent = formatTime(secondsRemaining);
+
+                if (secondsRemaining <= 30) {
+                    countdownTimer.classList.remove('text-slate-800');
+                    countdownTimer.classList.add('text-rose-600', 'pulse-timer');
+                    timerIcon.classList.add('text-rose-500', 'animate-spin');
+                }
+
+                if (secondsRemaining <= 5 && secondsRemaining > 0) {
+                    AudioFX.playBeep(850, 0.08);
+                }
+
+                if (secondsRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    AudioFX.playTimerFinish();
+                    submitStudentWords(true);
+                }
+            }, 1000);
+        }
+
+        // Add Word Form
+        wordAddForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const rawWord = wordInput.value.trim().toLowerCase();
+            inputFeedback.classList.add('hidden');
+
+            if (!rawWord) return;
+
+            // Allow English alphabet and standard hyphens/spaces (e.g., "father-in-law", "great grandmother")
+            const isValidVocab = /^[a-zA-Z\s\-]+$/.test(rawWord);
+            if (!isValidVocab) {
+                inputFeedback.textContent = "Please use English letters only (a-z)!";
+                inputFeedback.classList.remove('hidden');
+                return;
+            }
+
+            // Deduplication
+            if (localStudentWords.includes(rawWord)) {
+                inputFeedback.textContent = `You've already added "${rawWord}"!`;
+                inputFeedback.classList.remove('hidden');
+                return;
+            }
+
+            localStudentWords.push(rawWord);
+            AudioFX.playWordAdded();
+            wordInput.value = '';
+            renderStudentTags();
+            wordInput.focus();
+        });
+
+        function removeWord(index) {
+            localStudentWords.splice(index, 1);
+            renderStudentTags();
+        }
+
+        function renderStudentTags() {
+            tagsContainer.innerHTML = '';
+            wordCountLabel.textContent = localStudentWords.length;
+
+            if (localStudentWords.length === 0) {
+                tagsContainer.innerHTML = `<p class="text-slate-400 text-sm italic m-auto py-8">No words entered yet. Type your first word above!</p>`;
+                return;
+            }
+
+            localStudentWords.forEach((w, index) => {
+                const chip = document.createElement('div');
+                chip.className = "inline-flex items-center gap-1.5 px-3 py-1.5 bg-sky-100 text-sky-800 rounded-xl font-semibold text-sm border border-sky-200 shadow-sm animate-fade-in";
+                chip.innerHTML = `
+                    <span>${w}</span>
+                    <button type="button" class="text-sky-500 hover:text-rose-600 focus:outline-none p-0.5" title="Remove word">
+                        <i class="fa-solid fa-xmark text-xs"></i>
+                    </button>
+                `;
+                chip.querySelector('button').addEventListener('click', () => removeWord(index));
+                tagsContainer.appendChild(chip);
+            });
+        }
+
+        // Submit Logic
+        manualSubmitBtn.addEventListener('click', () => {
+            if (localStudentWords.length === 0) {
+                showAppModal("No Words Entered", "Please add at least one family member word before submitting!");
+                return;
+            }
+            submitStudentWords(false);
+        });
+
+        async function submitStudentWords(auto = false) {
+            clearInterval(timerInterval);
+
+            // Celebration confetti
+            try {
+                confetti({
+                    particleCount: 80,
+                    spread: 70,
+                    origin: { y: 0.6 }
+                });
+            } catch (e) {}
+
+            const submissionId = `sub_${Date.now()}_${Math.floor(Math.random()*1000)}`;
+            const submissionData = {
+                id: submissionId,
+                studentName: studentName || "Anonymous Student",
+                words: localStudentWords,
+                wordCount: localStudentWords.length,
+                submittedAt: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+                timestamp: Date.now()
+            };
+
+            // Cloud sync via Firestore
+            if (currentUser) {
+                try {
+                    const studentDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'submissions', `${currentUser.uid}_${Date.now()}`);
+                    await setDoc(studentDocRef, submissionData);
+                } catch (e) {
+                    console.error("Firestore submission save:", e);
+                }
+            }
+
+            // Cross-tab broadcast backup
+            if (broadcast) {
+                broadcast.postMessage({ type: 'NEW_SUBMISSION', payload: submissionData });
+            }
+
+            // Local fallback array
+            handleIncomingSubmission(submissionData);
+
+            // Switch to result card
+            studentQuizCard.classList.add('hidden');
+            studentSubmittedCard.classList.remove('hidden');
+            finalWordCount.textContent = localStudentWords.length;
+
+            submittedWordsSummary.innerHTML = localStudentWords.map(w => 
+                `<span class="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">${w}</span>`
+            ).join('');
+        }
+
+        // Retry button
+        studentRetryBtn.addEventListener('click', () => {
+            studentSubmittedCard.classList.add('hidden');
+            studentJoinCard.classList.remove('hidden');
+            studentNameInput.value = studentName;
+        });
+
+        // --- Teacher Dashboard Logic ---
+        function renderTeacherDashboard() {
+            // Sort by wordCount descending
+            const sortedSubmissions = [...allSubmissions].sort((a, b) => (b.wordCount || 0) - (a.wordCount || 0));
+
+            // Stats
+            teacherTotalStudents.textContent = sortedSubmissions.length;
+            liveBadgeCount.textContent = sortedSubmissions.length;
+
+            let totalWordsSum = 0;
+            const wordFrequencyMap = {};
+
+            sortedSubmissions.forEach(sub => {
+                const words = sub.words || [];
+                totalWordsSum += words.length;
+                words.forEach(w => {
+                    const cleanWord = w.toLowerCase().trim();
+                    wordFrequencyMap[cleanWord] = (wordFrequencyMap[cleanWord] || 0) + 1;
+                });
+            });
+
+            const uniqueWords = Object.keys(wordFrequencyMap);
+            teacherTotalWords.textContent = totalWordsSum;
+            teacherUniqueWordsCount.textContent = uniqueWords.length;
+
+            // Render Word Cloud
+            renderWordCloud(wordFrequencyMap);
+
+            // Render Leaderboard / Grid
+            if (sortedSubmissions.length === 0) {
+                emptySubmissionsState.classList.remove('hidden');
+                studentsGrid.innerHTML = '';
+            } else {
+                emptySubmissionsState.classList.add('hidden');
+                renderSubmissionsCards(sortedSubmissions);
+            }
+        }
+
+        function renderWordCloud(freqMap) {
+            const filterText = teacherWordSearch.value.trim().toLowerCase();
+            wordCloudContainer.innerHTML = '';
+
+            const entries = Object.entries(freqMap)
+                .filter(([word]) => !filterText || word.includes(filterText))
+                .sort((a, b) => b[1] - a[1]);
+
+            if (entries.length === 0) {
+                wordCloudContainer.innerHTML = `<p class="text-slate-400 italic text-sm text-center py-6">No words found matching your search!</p>`;
+                return;
+            }
+
+            const maxCount = Math.max(...entries.map(e => e[1]), 1);
+
+            entries.forEach(([word, count]) => {
+                const pill = document.createElement('span');
+                
+                let sizeClass = "text-xs py-1 px-3";
+                let colorClass = "bg-white/10 text-slate-200 border-white/20";
+
+                if (count >= maxCount && count > 1) {
+                    sizeClass = "text-lg font-black py-2 px-4 shadow-lg shadow-amber-500/30";
+                    colorClass = "bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-bold border-amber-300";
+                } else if (count > 2) {
+                    sizeClass = "text-base font-bold py-1.5 px-3.5";
+                    colorClass = "bg-indigo-500/80 text-white border-indigo-400";
+                } else if (count > 1) {
+                    sizeClass = "text-sm font-semibold py-1 px-3";
+                    colorClass = "bg-sky-500/60 text-sky-100 border-sky-400";
+                }
+
+                pill.className = `inline-flex items-center gap-1.5 rounded-2xl border transition-all hover:scale-110 cursor-default ${sizeClass} ${colorClass}`;
+                pill.innerHTML = `
+                    <span>${word}</span>
+                    <span class="text-[10px] opacity-80 bg-black/25 rounded-full px-1.5 py-0.2">${count}</span>
+                `;
+                wordCloudContainer.appendChild(pill);
+            });
+        }
+
+        function renderSubmissionsCards(submissions) {
+            studentsGrid.innerHTML = '';
+
+            submissions.forEach((sub, rank) => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-3xl p-5 shadow-sm border border-slate-200 hover:shadow-md transition-all flex flex-col justify-between";
+
+                const isTop1 = rank === 0;
+                const isTop2 = rank === 1;
+                const isTop3 = rank === 2;
+
+                let rankBadge = `<span class="w-7 h-7 rounded-full bg-slate-100 text-slate-600 font-bold text-xs flex items-center justify-center">#${rank + 1}</span>`;
+                if (isTop1) rankBadge = `<span class="w-7 h-7 rounded-full bg-amber-100 text-amber-700 font-bold text-sm flex items-center justify-center shadow-sm">🥇</span>`;
+                if (isTop2) rankBadge = `<span class="w-7 h-7 rounded-full bg-slate-200 text-slate-700 font-bold text-sm flex items-center justify-center shadow-sm">🥈</span>`;
+                if (isTop3) rankBadge = `<span class="w-7 h-7 rounded-full bg-amber-50 text-amber-800 font-bold text-sm flex items-center justify-center shadow-sm">🥉</span>`;
+
+                const words = sub.words || [];
+
+                card.innerHTML = `
+                    <div>
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="flex items-center gap-2.5">
+                                ${rankBadge}
+                                <div>
+                                    <h4 class="font-bold text-slate-800 text-base leading-tight">${escapeHtml(sub.studentName)}</h4>
+                                    <span class="text-[11px] text-slate-400"><i class="fa-regular fa-clock"></i> ${sub.submittedAt || ''}</span>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xl font-black text-sky-600 leading-none">${words.length}</span>
+                                <span class="text-[10px] block font-bold text-slate-400 uppercase">words</span>
+                            </div>
+                        </div>
+
+                        <!-- Word pills container -->
+                        <div class="bg-slate-50 rounded-2xl p-3 border border-slate-100 min-h-[90px] max-h-44 overflow-y-auto custom-scrollbar flex flex-wrap gap-1.5 content-start">
+                            ${words.map(w => `<span class="text-xs px-2.5 py-1 rounded-xl bg-white border border-slate-200 font-semibold text-slate-700 shadow-2xs">${escapeHtml(w)}</span>`).join('')}
+                        </div>
+                    </div>
+                `;
+
+                studentsGrid.appendChild(card);
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Search Filter
+        teacherWordSearch.addEventListener('input', () => {
+            renderTeacherDashboard();
+        });
+
+        // Fullscreen Toggle
+        toggleFullscreenBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.warn(`Fullscreen error: ${err.message}`);
+                });
+            } else {
+                document.exitFullscreen();
+            }
+        });
+
+        // Export to CSV
+        exportCsvBtn.addEventListener('click', () => {
+            if (allSubmissions.length === 0) {
+                showAppModal("No Data to Export", "There are currently no student submissions to export.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,Rank,Student Name,Word Count,Words,Submission Time\n";
+            const sorted = [...allSubmissions].sort((a, b) => (b.wordCount || 0) - (a.wordCount || 0));
+
+            sorted.forEach((sub, index) => {
+                const wordsJoined = `"${(sub.words || []).join(', ')}"`;
+                const cleanName = `"${(sub.studentName || '').replace(/"/g, '""')}"`;
+                csvContent += `${index + 1},${cleanName},${sub.wordCount || 0},${wordsJoined},"${sub.submittedAt || ''}"\n`;
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `family_vocab_blitz_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
+
+        // Reset Round / Session
+        resetSessionBtn.addEventListener('click', () => {
+            showAppModal(
+                "Start a New Round?",
+                "Are you sure you want to clear the current live board? This will delete all submissions on display.",
+                async () => {
+                    if (currentUser) {
+                        try {
+                            for (const sub of allSubmissions) {
+                                if (sub.id) {
+                                    const dRef = doc(db, 'artifacts', appId, 'public', 'data', 'submissions', sub.id);
+                                    await deleteDoc(dRef);
+                                }
+                            }
+                        } catch(e) {
+                            console.error("Firestore cleanup error:", e);
+                        }
+                    }
+                    if (broadcast) {
+                        broadcast.postMessage({ type: 'RESET_ALL' });
+                    }
+                    allSubmissions = [];
+                    renderTeacherDashboard();
+                },
+                true
+            );
+        });
+
+        // --- Share Modal & QR Code Generation ---
+        function generateQRCode() {
+            const currentUrl = window.location.href;
+            shareUrlInput.value = currentUrl;
+            qrcodeContainer.innerHTML = '';
+            
+            try {
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrcodeContainer, {
+                        text: currentUrl,
+                        width: 180,
+                        height: 180,
+                        colorDark: "#0f172a",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            } catch(e) {
+                console.warn("QR code render:", e);
+            }
+        }
+
+        sharePromptBtn.addEventListener('click', () => {
+            generateQRCode();
+            copySuccessMsg.classList.add('hidden');
+            shareModal.classList.remove('hidden');
+        });
+
+        closeShareModalBtn.addEventListener('click', () => {
+            shareModal.classList.add('hidden');
+        });
+
+        copyShareUrlBtn.addEventListener('click', () => {
+            shareUrlInput.select();
+            document.execCommand('copy');
+            copySuccessMsg.classList.remove('hidden');
+            setTimeout(() => {
+                copySuccessMsg.classList.add('hidden');
+            }, 2500);
+        });
+
+        // Initialize connection
+        authenticateAndSubscribe();
+    </script>
+</body>
+</html>
