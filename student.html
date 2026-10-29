@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Teacher Projector - Family Members Blitz</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
+  <style>
+    body { background: #0b0f19; font-family: system-ui, -apple-system, sans-serif; }
+  </style>
+</head>
+<body class="text-slate-100 min-h-screen p-6">
+
+  <header class="flex items-center justify-between border-b border-slate-800 pb-5 mb-6">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 bg-indigo-600/30 border border-indigo-500/40 rounded-2xl flex items-center justify-center text-indigo-400 text-xl font-bold">
+        <i class="fa-solid fa-chalkboard-user"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-extrabold text-white">Teacher Dashboard: Family Members</h1>
+        <p class="text-xs text-slate-400">Class Real-Time Vocabulary Submissions</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <span class="px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs font-semibold rounded-full flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> Live Connected
+      </span>
+      <button onclick="clearData()" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-xl border border-slate-700 transition">
+        Reset Game
+      </button>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    
+    <!-- QR Card -->
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 flex flex-col items-center text-center shadow-xl">
+      <span class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-2">Scan to Join</span>
+      <h2 class="text-base font-bold text-white mb-4">Students Scan Here</h2>
+      
+      <div id="qrcode" class="p-3 bg-white rounded-2xl shadow-md mb-4"></div>
+      
+      <p class="text-xs text-slate-400 mb-3">Scan with phone camera to start the 3-minute quiz.</p>
+      <input id="studentUrlInput" type="text" class="w-full text-[11px] bg-slate-950 border border-slate-800 rounded-lg p-2 text-slate-400 text-center select-all" readonly>
+    </div>
+
+    <!-- Word Cloud & Leaderboard -->
+    <div class="lg:col-span-3 space-y-6">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-cloud text-indigo-400"></i> Class Word Cloud
+          </h3>
+          <span id="totalWordsStat" class="text-xs font-semibold text-slate-400">0 Total Words</span>
+        </div>
+        <div id="wordCloud" class="flex flex-wrap items-center justify-center gap-3 min-h-[140px] p-4 bg-slate-950/60 rounded-2xl border border-slate-800/80">
+          <p class="text-sm text-slate-600 italic">Waiting for students to submit answers...</p>
+        </div>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+            <i class="fa-solid fa-trophy text-amber-400"></i> Student Submissions
+          </h3>
+          <span id="studentCountStat" class="text-xs font-bold px-2.5 py-1 bg-indigo-500/20 text-indigo-300 rounded-full">0 Students Submitted</span>
+        </div>
+        <div id="studentList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const firebaseConfig = {
+  apiKey: "AIzaSyCt4YQ6gS3WypFBWVOcpNrSQDDNvi_JEuY",
+  authDomain: "a22u20vocab.firebaseapp.com",
+  databaseURL: "https://a22u20vocab-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "a22u20vocab",
+  storageBucket: "a22u20vocab.firebasestorage.app",
+  messagingSenderId: "768340895051",
+  appId: "1:768340895051:web:411bafc67e5946fc71b4ce",
+  measurementId: "G-6MKY4M04RE"
+};
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Tự tạo link dẫn tới student.html trên GitHub Pages
+    const currentUrl = window.location.href.split('?')[0].split('#')[0];
+    const studentUrl = currentUrl.replace(/index\.html$/, '') + 'student.html';
+    document.getElementById('studentUrlInput').value = studentUrl;
+
+    new QRCode(document.getElementById("qrcode"), {
+      text: studentUrl,
+      width: 170,
+      height: 170,
+      colorDark : "#0f172a",
+      colorLight : "#ffffff"
+    });
+
+    let submissions = [];
+
+    // Lắng nghe dữ liệu thời gian thực từ Firebase
+    db.ref('submissions').on('value', (snapshot) => {
+      const data = snapshot.val();
+      submissions = data ? Object.values(data) : [];
+      updateDashboard();
+    });
+
+    function updateDashboard() {
+      document.getElementById('studentCountStat').textContent = `${submissions.length} Students Submitted`;
+      const sorted = [...submissions].sort((a,b) => (b.words?.length || 0) - (a.words?.length || 0));
+      
+      const listEl = document.getElementById('studentList');
+      listEl.innerHTML = "";
+      sorted.forEach((sub, idx) => {
+        const medal = idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx+1}`;
+        const card = document.createElement('div');
+        card.className = "p-4 bg-slate-950 border border-slate-800 rounded-2xl";
+        card.innerHTML = `
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base">${medal}</span>
+              <span class="font-bold text-white text-sm">${sub.name}</span>
+            </div>
+            <span class="text-xs font-semibold px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded-full">${sub.words?.length || 0} words</span>
+          </div>
+          <div class="flex flex-wrap gap-1 mt-2">
+            ${(sub.words || []).map(w => `<span class="text-[11px] px-2 py-0.5 bg-slate-800 text-slate-300 rounded-md border border-slate-700">${w}</span>`).join('')}
+          </div>
+        `;
+        listEl.appendChild(card);
+      });
+
+      const wordCounts = {};
+      let totalWords = 0;
+      submissions.forEach(s => {
+        (s.words || []).forEach(w => {
+          wordCounts[w] = (wordCounts[w] || 0) + 1;
+          totalWords++;
+        });
+      });
+      document.getElementById('totalWordsStat').textContent = `${totalWords} Total Words`;
+
+      const cloudEl = document.getElementById('wordCloud');
+      if (totalWords === 0) {
+        cloudEl.innerHTML = `<p class="text-sm text-slate-600 italic">Waiting for students to submit answers...</p>`;
+      } else {
+        cloudEl.innerHTML = "";
+        Object.entries(wordCounts).forEach(([word, count]) => {
+          const span = document.createElement('span');
+          const size = Math.min(28, 13 + count * 3);
+          span.style.fontSize = `${size}px`;
+          span.className = "font-bold text-indigo-400 px-2 py-1 bg-indigo-950/40 border border-indigo-800/40 rounded-xl";
+          span.textContent = `${word} (${count})`;
+          cloudEl.appendChild(span);
+        });
+      }
+    }
+
+    function clearData() {
+      if (confirm("Reset current game session?")) {
+        db.ref('submissions').remove();
+      }
+    }
+  </script>
+</body>
+</html>
