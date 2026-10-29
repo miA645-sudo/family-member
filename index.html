@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Members: 3-Minute Vocabulary Blitz</title>
+    <title id="pageTitle">Family Members: 3-Minute Vocabulary Blitz</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -40,6 +40,17 @@
     <!-- QRCode.js CDN for sharing with students -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
+    <!-- Immediate Early Detection Script to prevent flash of teacher UI -->
+    <script>
+        (function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const isStudent = urlParams.get('role') === 'student' || window.location.hash.toLowerCase().includes('student');
+            if (isStudent) {
+                document.documentElement.classList.add('student-mode');
+            }
+        })();
+    </script>
+
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -63,12 +74,19 @@
             background-color: #cbd5e1;
             border-radius: 9999px;
         }
+
+        /* HARD ISOLATION RULE: When student-mode is active, strip teacher components completely */
+        html.student-mode #mainHeader,
+        html.student-mode #teacherView,
+        html.student-mode .teacher-only {
+            display: none !important;
+        }
     </style>
 </head>
 <body class="text-slate-800 antialiased min-h-screen flex flex-col bg-slate-50 selection:bg-sky-100 selection:text-sky-800">
 
-    <!-- Top Navigation Bar & Mode Switcher -->
-    <header class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm transition-all">
+    <!-- Top Navigation Bar & Mode Switcher (Permanently hidden in student mode) -->
+    <header id="mainHeader" class="bg-white/90 backdrop-blur-md border-b border-slate-200 sticky top-0 z-40 shadow-sm transition-all">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3">
             <div class="flex items-center space-x-3">
                 <span class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-purple-600 flex items-center justify-center text-white text-xl shadow-md">
@@ -87,24 +105,31 @@
             <div class="flex items-center gap-2">
                 <button id="sharePromptBtn" class="px-3.5 py-2 text-xs sm:text-sm font-bold rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-200 shadow-sm transition flex items-center gap-2">
                     <i class="fa-solid fa-qrcode text-amber-600"></i>
-                    <span class="hidden sm:inline">Invite Students</span>
+                    <span>Invite Students</span>
                 </button>
 
                 <div class="flex items-center bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button id="navStudentBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-sky-600 shadow-sm">
-                        <i class="fa-solid fa-graduation-cap"></i>
-                        <span>Student View</span>
-                    </button>
-                    <button id="navTeacherBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                    <button id="navTeacherBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm">
                         <i class="fa-solid fa-chalkboard-user"></i>
-                        <span class="hidden md:inline">Teacher Board</span>
-                        <span class="md:hidden">Teacher</span>
+                        <span>Teacher Board</span>
                         <span id="liveBadgeCount" class="ml-1 px-1.5 py-0.5 text-[10px] font-bold bg-indigo-100 text-indigo-700 rounded-full">0</span>
+                    </button>
+                    <button id="navStudentBtn" class="px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-graduation-cap"></i>
+                        <span>Student Preview</span>
                     </button>
                 </div>
             </div>
         </div>
     </header>
+
+    <!-- Student-only Simple Header -->
+    <div id="studentMinimalHeader" class="hidden py-4 px-4 border-b border-slate-100 bg-white/70 backdrop-blur text-center">
+        <h2 class="text-base font-bold font-bubble text-slate-800 flex items-center justify-center gap-2">
+            <span>👨‍👩‍👧‍👦</span>
+            <span>Family Members Vocabulary Challenge</span>
+        </h2>
+    </div>
 
     <!-- Main Content Container -->
     <main class="flex-1 max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-start">
@@ -237,26 +262,19 @@
                     🎉
                 </div>
                 <div>
-                    <h2 class="text-3xl font-extrabold text-slate-800 font-bubble">Awesome Job!</h2>
-                    <p class="text-slate-600 text-sm mt-1">Your family vocabulary has been beamed straight to the Teacher Live Board!</p>
+                    <h2 class="text-3xl font-extrabold text-slate-800 font-bubble">Submitted! Great job!</h2>
+                    <p class="text-slate-600 text-sm mt-2 max-w-md mx-auto">Look up at the classroom projector screen to see the live results and rankings!</p>
                 </div>
 
                 <div class="max-w-md mx-auto bg-slate-50 rounded-2xl p-6 border border-slate-200">
-                    <span class="text-xs uppercase font-bold text-slate-400">Your Score</span>
+                    <span class="text-xs uppercase font-bold text-slate-400">Total Words Submitted</span>
                     <div class="text-5xl font-black text-emerald-600 my-2" id="finalWordCount">0</div>
-                    <div class="text-sm font-semibold text-slate-600 mb-4">valid family words remembered</div>
-                    
-                    <div id="submittedWordsSummary" class="flex flex-wrap gap-1.5 justify-center max-h-48 overflow-y-auto custom-scrollbar p-2">
-                        <!-- tags preview -->
-                    </div>
+                    <div class="text-xs font-semibold text-slate-500">Your answers have been securely synced with your teacher.</div>
                 </div>
 
                 <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
                     <button type="button" id="studentRetryBtn" class="px-6 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold transition flex items-center gap-2 text-sm">
                         <i class="fa-solid fa-rotate-left"></i> Play Again
-                    </button>
-                    <button type="button" id="studentGoToDashboardBtn" class="px-6 py-3 rounded-2xl bg-indigo-50 hover:bg-indigo-100 text-indigo-600 font-bold transition flex items-center gap-2 text-sm">
-                        <i class="fa-solid fa-chalkboard-user"></i> View Class Projector Board
                     </button>
                 </div>
             </div>
@@ -264,7 +282,7 @@
         </section>
 
         <!-- ======================= SECTION 2: TEACHER / PROJECTOR VIEW ======================= -->
-        <section id="teacherView" class="hidden space-y-6 w-full">
+        <section id="teacherView" class="space-y-6 w-full">
             
             <!-- Dashboard Controls Bar -->
             <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-md border border-slate-100 flex flex-wrap items-center justify-between gap-4">
@@ -387,7 +405,7 @@
             </div>
             <div>
                 <h4 class="text-2xl font-bold font-bubble text-slate-800">Invite Students to Play</h4>
-                <p class="text-xs sm:text-sm text-slate-500 mt-1">Ask students to scan the QR code below on their phones or tablets to start typing immediately!</p>
+                <p class="text-xs sm:text-sm text-slate-500 mt-1">Students scan this code to enter directly into the <strong>Student-Only View</strong> (Teacher panel is completely hidden from them).</p>
             </div>
 
             <!-- QR Container -->
@@ -395,9 +413,9 @@
                 <div id="qrcode" class="flex justify-center items-center"></div>
             </div>
 
-            <!-- Direct Link Copy Field -->
+            <!-- Direct Student Link Copy Field -->
             <div class="space-y-2 text-left">
-                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Direct Student Link:</label>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Student-Only Direct Link:</label>
                 <div class="flex items-center gap-2">
                     <input type="text" id="shareUrlInput" readonly class="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 font-mono text-slate-600 select-all outline-none">
                     <button type="button" id="copyShareUrlBtn" class="px-4 py-2.5 bg-sky-500 hover:bg-sky-600 text-white font-bold text-xs rounded-xl transition flex items-center gap-1.5 whitespace-nowrap">
@@ -471,6 +489,17 @@
         let secondsRemaining = 180; // 3 minutes = 180 seconds
         let allSubmissions = []; // submissions gathered from Cloud / Broadcast
 
+        // Determine if current visitor is student based on URL query or hash
+        const urlParams = new URLSearchParams(window.location.search);
+        const isStudentMode = urlParams.get('role') === 'student' || window.location.hash.toLowerCase().includes('student');
+
+        // Apply strict DOM isolation for student mode
+        if (isStudentMode) {
+            document.documentElement.classList.add('student-mode');
+            document.getElementById('pageTitle').textContent = "Family Words Challenge";
+            document.getElementById('studentMinimalHeader').classList.remove('hidden');
+        }
+
         // Cross-tab real-time sync backup (BroadcastChannel)
         const broadcast = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('vocab_blitz_channel') : null;
         if (broadcast) {
@@ -543,9 +572,7 @@
         const tagsContainer = document.getElementById('tagsContainer');
         const manualSubmitBtn = document.getElementById('manualSubmitBtn');
         const finalWordCount = document.getElementById('finalWordCount');
-        const submittedWordsSummary = document.getElementById('submittedWordsSummary');
         const studentRetryBtn = document.getElementById('studentRetryBtn');
-        const studentGoToDashboardBtn = document.getElementById('studentGoToDashboardBtn');
 
         // Teacher Elements
         const teacherTotalStudents = document.getElementById('teacherTotalStudents');
@@ -605,14 +632,14 @@
                 }
                 currentUser = auth.currentUser;
                 isConnectedToCloud = true;
-                connectionDot.classList.replace('bg-amber-400', 'bg-emerald-500');
-                connectionText.textContent = "Live Cloud Sync Active";
+                if (connectionDot) connectionDot.classList.replace('bg-amber-400', 'bg-emerald-500');
+                if (connectionText) connectionText.textContent = "Live Cloud Sync Active";
 
                 listenToSubmissions();
             } catch (err) {
                 console.warn("Using offline / local broadcast channel bridge:", err);
-                connectionDot.classList.replace('bg-amber-400', 'bg-sky-400');
-                connectionText.textContent = "Local Network Mode";
+                if (connectionDot) connectionDot.classList.replace('bg-amber-400', 'bg-sky-400');
+                if (connectionText) connectionText.textContent = "Local Network Mode";
             }
         }
 
@@ -626,7 +653,7 @@
                     list.push({ id: docSnap.id, ...docSnap.data() });
                 });
                 allSubmissions = list;
-                renderTeacherDashboard();
+                if (!isStudentMode) renderTeacherDashboard();
             }, (error) => {
                 console.warn("Firestore live snapshot note:", error);
             });
@@ -636,29 +663,38 @@
             const exists = allSubmissions.some(s => s.id === sub.id);
             if (!exists) {
                 allSubmissions.push(sub);
-                renderTeacherDashboard();
+                if (!isStudentMode) renderTeacherDashboard();
             }
         }
 
-        // --- Navigation Switcher ---
-        function setView(view) {
-            if (view === 'student') {
+        // Initial View Initialization
+        if (isStudentMode) {
+            studentView.classList.remove('hidden');
+            teacherView.classList.add('hidden');
+        } else {
+            // Default desktop starts in Teacher Board mode
+            teacherView.classList.remove('hidden');
+            studentView.classList.add('hidden');
+            renderTeacherDashboard();
+        }
+
+        // Navigation Switcher (Only active when NOT in student mode)
+        if (!isStudentMode) {
+            navStudentBtn.addEventListener('click', () => {
                 studentView.classList.remove('hidden');
                 teacherView.classList.add('hidden');
                 navStudentBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-sky-600 shadow-sm";
                 navTeacherBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
-            } else {
+            });
+
+            navTeacherBtn.addEventListener('click', () => {
                 teacherView.classList.remove('hidden');
                 studentView.classList.add('hidden');
                 navTeacherBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 bg-white text-indigo-600 shadow-sm";
                 navStudentBtn.className = "px-3.5 py-1.5 sm:px-4 sm:py-2 text-xs sm:text-sm font-semibold rounded-lg transition-all duration-200 flex items-center gap-1.5 text-slate-600 hover:text-slate-900";
                 renderTeacherDashboard();
-            }
+            });
         }
-
-        navStudentBtn.addEventListener('click', () => setView('student'));
-        navTeacherBtn.addEventListener('click', () => setView('teacher'));
-        studentGoToDashboardBtn.addEventListener('click', () => setView('teacher'));
 
         // --- Student Flow Logic ---
         joinForm.addEventListener('submit', (e) => {
@@ -722,7 +758,7 @@
 
             if (!rawWord) return;
 
-            // Allow English alphabet and standard hyphens/spaces (e.g., "father-in-law", "great grandmother")
+            // Allow English letters, spaces, hyphens
             const isValidVocab = /^[a-zA-Z\s\-]+$/.test(rawWord);
             if (!isValidVocab) {
                 inputFeedback.textContent = "Please use English letters only (a-z)!";
@@ -825,10 +861,6 @@
             studentQuizCard.classList.add('hidden');
             studentSubmittedCard.classList.remove('hidden');
             finalWordCount.textContent = localStudentWords.length;
-
-            submittedWordsSummary.innerHTML = localStudentWords.map(w => 
-                `<span class="px-2.5 py-1 bg-white border border-slate-200 text-slate-700 rounded-lg text-xs font-semibold">${w}</span>`
-            ).join('');
         }
 
         // Retry button
@@ -885,7 +917,7 @@
                 .sort((a, b) => b[1] - a[1]);
 
             if (entries.length === 0) {
-                wordCloudContainer.innerHTML = `<p class="text-slate-400 italic text-sm text-center py-6">No words found matching your search!</p>`;
+                wordCloudContainer.innerHTML = `<p class="text-slate-400 italic text-sm text-center py-6">No words submitted yet. Invite students using the QR Code!</p>`;
                 return;
             }
 
@@ -1037,16 +1069,21 @@
             );
         });
 
-        // --- Share Modal & QR Code Generation ---
+        // --- Share Modal & QR Code Generation (Strictly encodes ?role=student) ---
         function generateQRCode() {
-            const currentUrl = window.location.href;
-            shareUrlInput.value = currentUrl;
+            // Build the clean URL with ?role=student
+            const studentUrlObj = new URL(window.location.href);
+            studentUrlObj.searchParams.set('role', 'student');
+            studentUrlObj.hash = '';
+            const studentUrl = studentUrlObj.toString();
+
+            shareUrlInput.value = studentUrl;
             qrcodeContainer.innerHTML = '';
             
             try {
                 if (typeof QRCode !== 'undefined') {
                     new QRCode(qrcodeContainer, {
-                        text: currentUrl,
+                        text: studentUrl,
                         width: 180,
                         height: 180,
                         colorDark: "#0f172a",
